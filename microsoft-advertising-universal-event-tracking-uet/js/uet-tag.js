@@ -2,7 +2,7 @@
 (function(w,d,t,r,u){  
     var f,n,i;  
     w[u]=w[u]||[],f=function(){  
-        var o={ti: uet_tag_data.uet_tag_id, enableAutoSpaTracking: uet_tag_data.enableAutoSpaTracking, tm:"wpp_1.0.5"};  
+        var o={ti: uet_tag_data.uet_tag_id, enableAutoSpaTracking: uet_tag_data.enableAutoSpaTracking, tm:"wpp_1.0.7"};  
         o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")  
     },  
     n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){  

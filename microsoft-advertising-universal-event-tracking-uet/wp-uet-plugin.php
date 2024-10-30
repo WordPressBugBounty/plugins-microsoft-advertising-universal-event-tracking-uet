@@ -48,7 +48,7 @@ function UserSettingForEnableAutoSpaTracking() {
 		$enableSpa_bool = filter_var($options['enable_spa_tracking'], FILTER_VALIDATE_BOOLEAN);
 		if($enableSpa_bool)
 		{
-			return $options['enable_spa_tracking'];
+			return 'true';
 		}
 	}
     return 'false';
@@ -168,8 +168,7 @@ function UetEchoEnableSpa() {
     $options = get_option('UetTagSettings');
     $enableSpa = '';
     if(isset($options['enable_spa_tracking']) && filter_var($options['enable_spa_tracking'], FILTER_VALIDATE_BOOLEAN)){
-        $enableSpa = $options['enable_spa_tracking'];
-		echo "<input id='enable_spa_tracking' name='UetTagSettings[enable_spa_tracking]' type='text' value='" .esc_attr($enableSpa) ."' />";
+		echo "<input id='enable_spa_tracking' name='UetTagSettings[enable_spa_tracking]' type='text' value='" .esc_attr('true') ."' />";
     }
 	else
 	{
