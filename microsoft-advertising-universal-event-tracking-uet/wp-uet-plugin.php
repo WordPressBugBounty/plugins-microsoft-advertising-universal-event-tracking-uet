@@ -6,15 +6,15 @@
  * Plugin Name: Microsoft Advertising Universal Event Tracking (UET)
  * Plugin URI: https://ads.microsoft.com/
  * Description: The official plugin for setting up Microsoft Advertising UET.
- * Version: 1.0.7
+ * Version: 1.0.8
  * Author: Microsoft Corporation
  * Author URI: https://www.microsoft.com/
- * License: GPLv2 or later  
+ * License: GPLv2 or later
  */
 
  // NOTE: If you update 'Version' above, update the 'tm' parameter in the script.
 
- if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly   
+ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
  //
  // Register actions.
@@ -24,7 +24,10 @@ add_action( 'admin_menu', 'UetAddSettingsPage' ); // To add a settings page on t
 add_action( 'admin_init', 'UetRegisterSettings' ); // To support the actual UET settings.
 add_action( 'admin_notices', 'UetShowAdminNotice' ); // To show an admin banner when UET is not setup correctly.
 add_filter( 'plugin_action_links_'.plugin_basename(__FILE__), 'UetAddSettingsLinkOnPluginDashboard' ); // To add a link to the settings page from the plugin dashboard
-
+add_action( 'wp_enqueue_scripts', 'UetEnqueueAssets' );
+function UetEnqueueAssets() {
+	wp_enqueue_script( 'uet-consent-script', plugin_dir_url(__FILE__) . "/js/consent.js", array('wp-consent-api','jquery'), "1.0.0", false );
+}
 register_activation_hook( __FILE__, function() {
   add_option('MsUet_Activated_Plugin','microsoft-advertising-universal-event-tracking-uet');
 });
@@ -54,27 +57,27 @@ function UserSettingForEnableAutoSpaTracking() {
     return 'false';
 }
 
-function UetPageLoadEvent() {  
-    if (!UetIsTagAvailable()) return null;  
-  
-    $options = get_option('UetTagSettings');  
-    $uet_tag_id = $options['uet_tag_id'];  
-    if (!ctype_digit($uet_tag_id)) {  
-        $uet_tag_id = '';  
-    }  
-  
-    $uet_tag_data = array(  
-        'uet_tag_id' => esc_attr($uet_tag_id),  
-        'enableAutoSpaTracking' => esc_attr(UserSettingForEnableAutoSpaTracking())  
-    );  
-  
-    wp_register_script('uet-tag-script', plugins_url('/js/uet-tag.js', __FILE__), array(), "1.0.0", false);  
-    wp_localize_script('uet-tag-script', 'uet_tag_data', $uet_tag_data);  
-    wp_enqueue_script('uet-tag-script');  
-  
-    return null;  
-} 
-add_action('wp_enqueue_scripts', 'UetPageLoadEvent');  
+function UetPageLoadEvent() {
+    if (!UetIsTagAvailable()) return null;
+
+    $options = get_option('UetTagSettings');
+    $uet_tag_id = $options['uet_tag_id'];
+    if (!ctype_digit($uet_tag_id)) {
+        $uet_tag_id = '';
+    }
+
+    $uet_tag_data = array(
+        'uet_tag_id' => esc_attr($uet_tag_id),
+        'enableAutoSpaTracking' => esc_attr(UserSettingForEnableAutoSpaTracking())
+    );
+
+    wp_register_script('uet-tag-script', plugins_url('/js/uet-tag.js', __FILE__), array(), "1.0.0", false);
+    wp_localize_script('uet-tag-script', 'uet_tag_data', $uet_tag_data);
+    wp_enqueue_script('uet-tag-script');
+
+    return null;
+}
+add_action('wp_enqueue_scripts', 'UetPageLoadEvent');
 
 function UetAddSettingsPage() {
     add_options_page('Microsoft Advertising UET settings', 'UET tag', 'manage_options', 'uet_tag_settings_page', 'UetRenderSettingsPage');
@@ -92,37 +95,37 @@ function UetRenderSettingsPage() {
         <?php
         settings_fields( 'UetTagSettings' );
         do_settings_sections( 'uet_tag_settings_page' ); ?>
-		<input name="submit" class="button button-primary" type="submit" value="<?php echo esc_attr( 'Save' ); ?>" />  
+		<input name="submit" class="button button-primary" type="submit" value="<?php echo esc_attr( 'Save' ); ?>" />
     </form>
 <?php
 }
 
-function sanitize_uet_tag_settings( $input ) {  
-    $new_input = array();  
-  
-	//should be number 
-    if ( isset( $input['uet_tag_id'] ) ) {  
-        $new_input['uet_tag_id'] = absint( $input['uet_tag_id'] );  
-    }  
-  
+function sanitize_uet_tag_settings( $input ) {
+    $new_input = array();
+
+	//should be number
+    if ( isset( $input['uet_tag_id'] ) ) {
+        $new_input['uet_tag_id'] = absint( $input['uet_tag_id'] );
+    }
+
 	//should be boolean value
-    if ( isset( $input['enable_spa_tracking'] ) ) {  
-        $new_input['enable_spa_tracking'] = filter_var( $input['enable_spa_tracking'], FILTER_VALIDATE_BOOLEAN);  
-    }  
-  
-    return $new_input;  
-}  
+    if ( isset( $input['enable_spa_tracking'] ) ) {
+        $new_input['enable_spa_tracking'] = filter_var( $input['enable_spa_tracking'], FILTER_VALIDATE_BOOLEAN);
+    }
+
+    return $new_input;
+}
 
 
 function UetRegisterSettings() {
-	register_setting('UetTagSettings', 'UetTagSettings', 'sanitize_uet_tag_settings' );  
+	register_setting('UetTagSettings', 'UetTagSettings', 'sanitize_uet_tag_settings' );
     add_settings_section('uet_general_settings_section', '', 'UetRenderGeneralSettingsSectionHeader', 'uet_tag_settings_page');
     add_settings_field('uet_tag_id', 'UET Tag ID', 'UetEchoTagId', 'uet_tag_settings_page', 'uet_general_settings_section');
 	add_settings_field('enable_spa_tracking', "Enable SPA Tracking", "UetEchoEnableSpa", 'uet_tag_settings_page', 'uet_general_settings_section');
-    
+
 	if(is_admin() && get_option('MsUet_Activated_Plugin') == 'microsoft-advertising-universal-event-tracking-uet') {
 		delete_option('MsUet_Activated_Plugin');
-		
+
 		$options = get_option('UetTagSettings');
 		include 'tagid.php';
 		if (empty($options['uet_tag_id']) && !empty($tagid)) {
@@ -181,15 +184,15 @@ function UetShowAdminNotice() {
 	global $pagenow;
     if ( $pagenow != 'index.php' && $pagenow != 'plugins.php') return;
 	?>
-	<div class="notice notice-warning is-dismissible"><p><span style="font-weight: 600;">Set up Microsoft Advertising Universal Event Tracking</span> Please complete UET tag setup by 
+	<div class="notice notice-warning is-dismissible"><p><span style="font-weight: 600;">Set up Microsoft Advertising Universal Event Tracking</span> Please complete UET tag setup by
 	<a href='<?php echo esc_url(admin_url('options-general.php?page=uet_tag_settings_page'))?>'>configuring the UET tag ID</a>.</p></div>
 	<?php
 }
 
 function UetAddSettingsLinkOnPluginDashboard( $links ) {
-	$uet_settings_link = '<a href="' .  
-       admin_url( 'options-general.php?page=uet_tag_settings_page' ) .  
-       '">Settings</a>';  
+	$uet_settings_link = '<a href="' .
+       admin_url( 'options-general.php?page=uet_tag_settings_page' ) .
+       '">Settings</a>';
 	array_unshift($links, $uet_settings_link);
 	return $links;
 }

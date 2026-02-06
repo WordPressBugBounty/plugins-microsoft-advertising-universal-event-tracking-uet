@@ -4,8 +4,8 @@ Tags: Microsoft, Bing ads, Advertising, UET, Microsoft Advertising
 Requires at least: 5.1
 Tested up to: 6.6
 Requires PHP: 7.2
-License: GPLv2 or later  
-Stable tag: 1.0.7
+License: GPLv2 or later
+Stable tag: 1.0.8
 
 The official plugin for setting up Microsoft Advertising UET
 
@@ -20,7 +20,10 @@ This plugin will install Microsoft Advertising Universal Event Tracking (UET) ta
 1. Configure your UET Tag ID from your Microsoft Advertising account on the UET Tag settings page.
 
 == Changelog ==
-= 1.0.7 = 
+= 1.0.8 =
+* update to support wp consent api
+
+= 1.0.7 =
 * update for code quality and safety
 
 == Changelog ==
@@ -32,7 +35,7 @@ This plugin will install Microsoft Advertising Universal Event Tracking (UET) ta
 * update to support SPA detection
 
 = 1.0.4=
-* update to protect from XSS
+* update to protect from XSS.
 
 = 1.0.0 =
 * Initial release.
